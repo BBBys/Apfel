@@ -1,14 +1,12 @@
 import sys, logging
 from PIL import Image
-from genfrac import generate_fractal
+from genfrac1 import generate_fractal
 
-
-
-def main(width, path,maxiter):
+def main(width, path,maxiter,loga):
  
     height = int(1.5 * width)
 
-    image = generate_fractal(width, height,maxiter)
+    image = generate_fractal(width, height,maxiter,loga)
     image.save(path)
     image.show()
     logging.info(f"Fraktal gespeichert als {path} ({width}x{height}), {maxiter} Iterationen")
@@ -22,6 +20,9 @@ if __name__ == "__main__":
         description="...zeichnen eines Apfelmännchen-Fraktals",
     )
     parser.add_argument(
+        "-l", "--loga", dest="pLOGA", action="store_true", help="Log-Farb-Darstellung"
+    )
+    parser.add_argument(
         "-v", "--verbose", dest="pVerbose", action="store_true", help="Debug-Ausgabe"
     )
     parser.add_argument("-w",dest="w", nargs='?', default=200, help="Breite")
@@ -33,6 +34,7 @@ if __name__ == "__main__":
     pWIDTH =int( arguments.w)
     pMAX =int( arguments.m)
     pPATH = arguments.path
+    loga= arguments.pLOGA
 
     if arguments.pVerbose:
         logging.basicConfig(level=logging.DEBUG)
@@ -40,7 +42,7 @@ if __name__ == "__main__":
         logging.basicConfig(level=logging.INFO)
 
     logging.info("Starte Mandelbrot-Fraktal-Generierung")
-    main(pWIDTH, pPATH,pMAX)
+    main(pWIDTH, pPATH,pMAX,loga)
 #
 # Für eine Animation des Apfelmännchen-Fraktals gibt es einige spannende Möglichkeiten, die du auf dem Raspberry Pi umsetzen kannst. Hier sind ein paar kreative Ansätze:
 #
