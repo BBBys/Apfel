@@ -3,11 +3,11 @@ from PIL import Image
 from genfrac1 import generate_fractal
 
 
-def main(width, path, maxiter, loga,koord):
+def main(width, path, maxiter, loga, koord, statist):
 
     height = int(1.5 * width)
 
-    image = generate_fractal(width, height, maxiter, loga,koord)
+    image = generate_fractal(width, height, maxiter, loga, koord, statist)
     image.save(path)
     image.show()
     logging.info(
@@ -29,11 +29,26 @@ if __name__ == "__main__":
         "-v", "--verbose", dest="pVerbose", action="store_true", help="Debug-Ausgabe"
     )
     parser.add_argument(
-        "-k", "--koordinaten", dest="pKoord", action="store_true", help="mit Koordinaten"
+        "-s",
+        "--statistik",
+        dest="pStat",
+        action="store_true",
+        help="Ausgabe für Statistik",
+    )
+    parser.add_argument(
+        "-k",
+        "--koordinaten",
+        dest="pKoord",
+        action="store_true",
+        help="mit Koordinaten",
     )
     parser.add_argument("-w", dest="w", nargs="?", default=200, help="Breite")
     parser.add_argument(
-        "-m", dest="m", nargs="?", default=1000, help="max. Iterationen"
+        "-m",
+        dest="m",
+        nargs="?",
+        default=1000,
+        help="max. Iterationen (Grenzwert meist ab 20 erreicht)",
     )
     parser.add_argument(
         "path", nargs="?", default="./bild.png", help="Dateiname für das Bild"
@@ -44,6 +59,7 @@ if __name__ == "__main__":
     pPATH = arguments.path
     loga = arguments.pLOGA
     pKOORD = arguments.pKoord
+    pSTAT = arguments.pStat
 
     if arguments.pVerbose:
         logging.basicConfig(level=logging.DEBUG)
@@ -51,7 +67,7 @@ if __name__ == "__main__":
         logging.basicConfig(level=logging.INFO)
 
     logging.info("Starte Mandelbrot-Fraktal-Generierung")
-    main(pWIDTH, pPATH, pMAX, loga,pKOORD)
+    main(pWIDTH, pPATH, pMAX, loga, pKOORD, pSTAT)
 #
 # Für eine Animation des Apfelmännchen-Fraktals gibt es einige spannende Möglichkeiten, die du auf dem Raspberry Pi umsetzen kannst. Hier sind ein paar kreative Ansätze:
 #
