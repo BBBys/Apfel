@@ -2,14 +2,17 @@ import sys, logging
 from PIL import Image
 from genfrac1 import generate_fractal
 
-def main(width, path,maxiter,loga):
- 
+
+def main(width, path, maxiter, loga,koord):
+
     height = int(1.5 * width)
 
-    image = generate_fractal(width, height,maxiter,loga)
+    image = generate_fractal(width, height, maxiter, loga,koord)
     image.save(path)
     image.show()
-    logging.info(f"Fraktal gespeichert als {path} ({width}x{height}), {maxiter} Iterationen")
+    logging.info(
+        f"Fraktal gespeichert als {path} ({width}x{height}), {maxiter} Iterationen"
+    )
 
 
 if __name__ == "__main__":
@@ -25,16 +28,22 @@ if __name__ == "__main__":
     parser.add_argument(
         "-v", "--verbose", dest="pVerbose", action="store_true", help="Debug-Ausgabe"
     )
-    parser.add_argument("-w",dest="w", nargs='?', default=200, help="Breite")
-    parser.add_argument("-m",dest="m", nargs='?', default=1000, help="max. Iterationen")
+    parser.add_argument(
+        "-k", "--koordinaten", dest="pKoord", action="store_true", help="mit Koordinaten"
+    )
+    parser.add_argument("-w", dest="w", nargs="?", default=200, help="Breite")
+    parser.add_argument(
+        "-m", dest="m", nargs="?", default=1000, help="max. Iterationen"
+    )
     parser.add_argument(
         "path", nargs="?", default="./bild.png", help="Dateiname für das Bild"
     )
     arguments = parser.parse_args()
-    pWIDTH =int( arguments.w)
-    pMAX =int( arguments.m)
+    pWIDTH = int(arguments.w)
+    pMAX = int(arguments.m)
     pPATH = arguments.path
-    loga= arguments.pLOGA
+    loga = arguments.pLOGA
+    pKOORD = arguments.pKoord
 
     if arguments.pVerbose:
         logging.basicConfig(level=logging.DEBUG)
@@ -42,7 +51,7 @@ if __name__ == "__main__":
         logging.basicConfig(level=logging.INFO)
 
     logging.info("Starte Mandelbrot-Fraktal-Generierung")
-    main(pWIDTH, pPATH,pMAX,loga)
+    main(pWIDTH, pPATH, pMAX, loga,pKOORD)
 #
 # Für eine Animation des Apfelmännchen-Fraktals gibt es einige spannende Möglichkeiten, die du auf dem Raspberry Pi umsetzen kannst. Hier sind ein paar kreative Ansätze:
 #
