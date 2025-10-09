@@ -47,8 +47,8 @@ if __name__ == "__main__":
         "-m",
         dest="m",
         nargs="?",
-        default=1000,
-        help="max. Iterationen (Grenzwert meist ab 20 erreicht)",
+        default=555,
+        help="max. Iterationen [555] (Grenzwert meist ab 20 erreicht)",
     )
     parser.add_argument(
         "path", nargs="?", default="./bild.png", help="Dateiname für das Bild"
