@@ -6,7 +6,7 @@
 import logging
 from math import log10
 from PIL import Image
-
+from farbig import farbe
 
 def mandelbrot(c, max_iter, z1=0):
     absmax=1000.0
@@ -68,28 +68,15 @@ def generate_fractal(
                 fout.write(f"{m};{abszend0};{abszend1};\n")
 
             if loga:
-                if m < 1:
-                    m = 1
+                if m < 1: m = 1
                 f = log10(m) / log10(max_iter)
                 cr = cg = cb = 255 - int(f * 255)
+                pixels[x, y] = (cr, cg, cb)
             else:
-                # cr=cb=cg = 255 - int(m * 255 / max_iter)
-                cr = cb = cg = 255
-                if m > 4:
-                    cr, cg, cb = 255, 60, 0  # rot        10%
-                if m > 5:
-                    cr, cg, cb = 255, 255, 0  # gelb       25%
-                if m > 6:
-                    cr, cg, cb = 0, 255, 0  # grün       50%
-                if m > 10:
-                    cr, cg, cb = 0, 0, m * 24  # blau       75%
-                if m > 29:
-                    # Grenzwert wahrscheinlich erreicht
-                    #cr, cg, cb = 0, 0, 0  # schwarz    90%
-                    c=int(200*abszend1)
-                    cr=cg=cb=c%256
+                   
+                if m > 55:  pixels[x, y] = (0,0,0)
+                else:       pixels[x, y] =farbe(m,4,55)
                     
-            pixels[x, y] = (cr, cg, cb)
             if koord:
                 if (x - x0) % sx == 0 or (y - y0) % sy == 0:
                     pixels[x, y] = (0, 255, 0)
