@@ -27,7 +27,13 @@ def generate_fractal(
     width, height, max_iter=1000, loga=False, koord=False, statistik=False
 ):
     # Bildbereich im komplexen Raum
-    re_start, re_end = -2.0, 1.0
+    # real waagrecht, imag senkrecht
+    # Koordinatenbereich 3.0x3.0
+    # Standard:
+    #re_start, re_end = -2.0, 1.0
+    #im_start, im_end = -1.5, 1.5
+    # 16x9-Format
+    re_start, re_end = -3.0, 1.5
     im_start, im_end = -1.5, 1.5
 
     image = Image.new("RGB", (width, height), "white")
@@ -74,7 +80,7 @@ def generate_fractal(
                 pixels[x, y] = (cr, cg, cb)
             else:
                    
-                if m > 55:  pixels[x, y] = (0,0,0)
+                if m > max_iter-2:  pixels[x, y] = (0,0,0)
                 else:       pixels[x, y] =farbe(m,4,55)
                     
             if koord:

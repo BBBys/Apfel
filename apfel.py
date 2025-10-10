@@ -5,7 +5,9 @@ from genfrac1 import generate_fractal
 
 def main(width, path, maxiter, loga, koord, statist):
 
-    height = int(1.5 * width)
+    #height = int(1.5 * width)
+    # 16x9-Format
+    height = int(9.0/16.0 * width)
 
     image = generate_fractal(width, height, maxiter, loga, koord, statist)
     image.save(path)

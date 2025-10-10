@@ -8,7 +8,8 @@ GET DATA
   /QUALIFIER='"'
   /VARIABLES=
     iters F2.0
-    zend DOT18.11.
+    zend DOT18.11
+    zdanach DOT18.11.
 
 
 EXAMINE 
