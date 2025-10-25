@@ -7,21 +7,7 @@ import logging
 from math import log10
 from PIL import Image
 from farbig import farbe
-
-def mandelbrot(c, max_iter, z1=0):
-    absmax=1000.0
-    z0=0.0
-    for n in range(max_iter):
-        if abs(z1) >absmax:
-            # setzt man max_iter auf 100, Grenze auf > 1000
-            # ist der Abbruchwert in 75% der Fälle
-            # nach 11 Iterationen erreicht
-            return n, abs(z0),abs(z1)
-        z0=z1
-        z1 = z1 * z1 + c
-    #if abs(z) > absmax:print(z,abs(z),n)
-    return max_iter-1, abs(z0),abs(z1)
-
+from iteration import mandelbrot as iterformel
 
 def generate_fractal(
     width, height, max_iter=1000, loga=False, koord=False, statistik=False
@@ -69,7 +55,7 @@ def generate_fractal(
             y1 = im_start + (y * dim)
             # Umrechnung von Pixelkoordinaten in komplexe Zahlen
             c = complex(x1, y1)
-            m, abszend0, abszend1 = mandelbrot(c, max_iter, zstart)
+            m, abszend0, abszend1 = iterformel(c, max_iter, zstart)
             if fout is not None:
                 fout.write(f"{m};{abszend0};{abszend1};\n")
 

@@ -1,9 +1,15 @@
-Simples Programm, der wo ein Apfelmännchen zeichnet.
-Wer Spaß daran hat darf er gerne erweitern:
+Simpler Programm, der wo ein Apfelmännchen zeichnet.
+
+# aktueller Stand
+* Iterationsformel (abgelegt in Mandelbrot(...))
+$z_1 = z_0² + c$ und Darstellung über c = x + j y
+
+# Contribute
+Wer Spaß daran hat darf ihn gerne erweitern:
 * [x] etwas Farbe
 * [ ] mehr Farbe
 * [x] Koordinatensystem
 * [ ] besseres Koordinatensystem
 * [ ] Ausschnitt und Zoom
-* [ ] dreidinebsional
+* [ ] dreidimensional
 * [ ] ?
