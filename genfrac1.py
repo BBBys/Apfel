@@ -8,25 +8,34 @@ from math import log10
 from PIL import Image
 from farbig import farbe
 from iteration import mandelbrot as iterformel
+import numpy as np
+
 
 def generate_fractal(
-    width, height, max_iter=1000, loga=False, koord=False, statistik=False
+    xWidth, yHeight, max_iter=1000, loga=False, koord=False, statistik=False
 ):
     # Bildbereich im komplexen Raum
     # real waagrecht, imag senkrecht
     # Koordinatenbereich 3.0x3.0
     # Standard:
-    #re_start, re_end = -2.0, 1.0
-    #im_start, im_end = -1.5, 1.5
+    # re_start, re_end = -1.5, 1.5
+    # im_start, im_end = -1.5, 1.5
     # 16x9-Format
-    re_start, re_end = -3.0, 1.5
-    im_start, im_end = -1.5, 1.5
+    # Realteil senkrecht!
+    re_start, re_end = -1.5, 1.5
+    im_start, im_end = -2.2, 0.5
+    # ??image = np.zeros((height,width,3), np.uint8)
+    # image = Image.new("RGB", (width, height), "white")
+    # pixels = image.load()
+    werte = np.zeros((xWidth, yHeight), dtype=np.uint16)
+    pixel = np.zeros((xWidth, yHeight, 3), dtype=np.uint8)
+    logging.debug(f"werte array erstellt: {werte.shape}")
+    logging.debug(f"pixel array erstellt: {pixel.shape}")
 
-    image = Image.new("RGB", (width, height), "white")
-    pixels = image.load()
+    logging.debug(f"Generiere Fraktal: xw x yh = {xWidth}x{yHeight}")
     # Abstand der Pixel in Weltkoordinaten
-    dre = (re_end - re_start) / width
-    dim = (im_end - im_start) / height
+    dre = (re_end - re_start) / xWidth
+    dim = (im_end - im_start) / yHeight
     logging.debug(f"Pixelabstand: dre={dre}, dim={dim}")
     # Nullpunkte
     #   re_start + (x * dre)=0
@@ -49,31 +58,41 @@ def generate_fractal(
     else:
         fout = None
 
-    for x in range(width):
-        x1 = re_start + (x * dre)
-        for y in range(height):
-            y1 = im_start + (y * dim)
+    for y in range(yHeight):
+        y1 = im_start + (y * dim)
+
+        for x in range(xWidth):
+            x1 = re_start + (x * dre)
             # Umrechnung von Pixelkoordinaten in komplexe Zahlen
-            c = complex(x1, y1)
+            c = complex(y1, x1)
             m, abszend0, abszend1 = iterformel(c, max_iter, zstart)
+            werte[x, y] = m
+
+    for x in range(xWidth):
+        for y in range(yHeight):
+            m = werte[x, y]
+            # logging.debug(f"m({x},{y}): {m}")
             if fout is not None:
                 fout.write(f"{m};{abszend0};{abszend1};\n")
 
             if loga:
-                if m < 1: m = 1
+                if m < 1:
+                    m = 1
                 f = log10(m) / log10(max_iter)
                 cr = cg = cb = 255 - int(f * 255)
-                pixels[x, y] = (cr, cg, cb)
+                pixel[x, y] = (cr, cg, cb)
             else:
-                   
-                if m > max_iter-2:  pixels[x, y] = (0,0,0)
-                else:       pixels[x, y] =farbe(m,4,55)
-                    
+
+                if m > max_iter - 2:
+                    pixel[x][y] = [0, 0, 0]
+                else:
+                    pixel[x, y] = farbe(m, 4, 55)
+
             if koord:
                 if (x - x0) % sx == 0 or (y - y0) % sy == 0:
-                    pixels[x, y] = (0, 255, 0)
+                    pixel[x, y] = (0, 255, 0)
                 if x == x0 or y == y0:
-                    pixels[x, y] = (255, 0, 0)
+                    pixel[x, y] = (255, 0, 0)
     if fout is not None:
         fout.close()
 
@@ -83,4 +102,4 @@ def generate_fractal(
     #    if x1 == width // 2 or y1 == height // 2:
     #        pixels[x, y] = (0, 255, 0)
 
-    return image
+    return pixel
