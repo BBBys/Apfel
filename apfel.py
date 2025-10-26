@@ -1,20 +1,61 @@
 import sys, logging
 from PIL import Image
 from genfrac1 import generate_fractal
+import cv2, numpy as np
+
+
+def mouse_callback(event, x, y, flags, param):
+    global image_to_show, s_x, s_y, e_x, e_y, mouse_pressed
+    logging.debug(f"Mouse event: {event} at ({x},{y})")
+    if event == cv2.EVENT_LBUTTONDOWN:
+        mouse_pressed = True
+        s_x, s_y = x, y
+        image_to_show = np.copy(image)
+    elif event == cv2.EVENT_MOUSEMOVE:
+        if mouse_pressed:
+            image_to_show = np.copy(image)
+            cv2.rectangle(image_to_show, (s_x, s_y), (x, y), (0, 255, 0), 1)
+    elif event == cv2.EVENT_LBUTTONUP:
+        mouse_pressed = False
+        e_x, e_y = x, y
 
 
 def main(width, path, maxiter, loga, koord, statist):
+    global image_to_show, s_x, s_y, e_x, e_y, mouse_pressed
 
-    #height = int(1.5 * width)
+    # height = int(1.5 * width)
     # 16x9-Format
-    height = int(9.0/16.0 * width)
+    height = int(9.0 / 16.0 * width)
 
-    image = generate_fractal(width, height, maxiter, loga, koord, statist)
-    image.save(path)
-    image.show()
-    logging.info(
-        f"Fraktal gespeichert als {path} ({width}x{height}), {maxiter} Iterationen"
-    )
+    bild = generate_fractal(height, width, maxiter, loga, koord, statist)
+    # bild.write(path)
+    # logging.info(
+    #    f"Fraktal gespeichert als {path} ({width}x{height}), {maxiter} Iterationen"
+    # )
+
+    mouse_pressed = False
+    s_x = s_y = e_x = e_y = -1
+    cv2.namedWindow("guiBild", cv2.WINDOW_FULLSCREEN)
+    cv2.setMouseCallback("guiBild", mouse_callback)
+    zeigebild = np.copy(bild)
+
+    while True:
+        cv2.imshow("guiBild", zeigebild)
+        k = cv2.waitKey(1)
+        if k == ord("c"):
+            if s_y > e_y:
+                s_y, e_y = e_y, s_y
+            if s_x > e_x:
+                s_x, e_x = e_x, s_x
+            if e_y - s_y > 1 and e_x - s_x > 0:
+                pixelarray = pixelarray[s_y:e_y, s_x:e_x]
+                zeigebild = np.copy(pixelarray)
+        elif k == 27:
+            break
+    cv2.destroyAllWindows()
+
+    # cv2.imshow("Original image",bild)
+    # cv2.waitKey(0)
 
 
 if __name__ == "__main__":
