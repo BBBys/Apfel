@@ -2,57 +2,78 @@ import sys, logging
 from PIL import Image
 from genfrac1 import generate_fractal
 import cv2, numpy as np
+from berechnen import berBildGrenzen,berNeueGrenzen
 
 
 def mouse_callback(event, x, y, flags, param):
-    global image_to_show, s_x, s_y, e_x, e_y, mouse_pressed
-    logging.debug(f"Mouse event: {event} at ({x},{y})")
+    global bild, zeigebild, s_x, s_y, e_x, e_y, mouse_pressed
     if event == cv2.EVENT_LBUTTONDOWN:
+        logging.debug(f"Mouse event: {event} at ({x},{y})")
+        logging.debug(f"Komplex ({x},{y})")
         mouse_pressed = True
         s_x, s_y = x, y
-        image_to_show = np.copy(image)
+        zeigebild = np.copy(bild)
     elif event == cv2.EVENT_MOUSEMOVE:
         if mouse_pressed:
-            image_to_show = np.copy(image)
-            cv2.rectangle(image_to_show, (s_x, s_y), (x, y), (0, 255, 0), 1)
+            zeigebild = np.copy(bild)
+            cv2.rectangle(zeigebild, (s_x, s_y), (x, y), (0, 255, 0), 1)
     elif event == cv2.EVENT_LBUTTONUP:
         mouse_pressed = False
         e_x, e_y = x, y
 
 
 def main(width, path, maxiter, loga, koord, statist):
-    global image_to_show, s_x, s_y, e_x, e_y, mouse_pressed
+    global bild, zeigebild, s_x, s_y, e_x, e_y, mouse_pressed
 
     # height = int(1.5 * width)
     # 16x9-Format
     height = int(9.0 / 16.0 * width)
+    re_start, re_end = -1.5, 1.5
+    im_start, im_end = -2.2, 0.5
+    berBildGrenzen(re_start, re_end, im_start, im_end)
 
-    bild = generate_fractal(height, width, maxiter, loga, koord, statist)
-    # bild.write(path)
-    # logging.info(
-    #    f"Fraktal gespeichert als {path} ({width}x{height}), {maxiter} Iterationen"
-    # )
+    weiter = True
+    while weiter:
+        bild = generate_fractal(
+            height,
+            width,
+            maxiter,
+            loga,
+            koord,
+            statist
+        )
+        # bild.write(path)
+        # logging.info(
+        #    f"Fraktal gespeichert als {path} ({width}x{height}), {maxiter} Iterationen"
+        # )
 
-    mouse_pressed = False
-    s_x = s_y = e_x = e_y = -1
-    cv2.namedWindow("guiBild", cv2.WINDOW_FULLSCREEN)
-    cv2.setMouseCallback("guiBild", mouse_callback)
-    zeigebild = np.copy(bild)
+        mouse_pressed = False
+        s_x = s_y = e_x = e_y = -1
+        cv2.namedWindow("guiBild", cv2.WINDOW_FULLSCREEN)
+        cv2.setMouseCallback("guiBild", mouse_callback)
+        zeigebild = np.copy(bild)
 
-    while True:
-        cv2.imshow("guiBild", zeigebild)
-        k = cv2.waitKey(1)
-        if k == ord("c"):
-            if s_y > e_y:
-                s_y, e_y = e_y, s_y
-            if s_x > e_x:
-                s_x, e_x = e_x, s_x
-            if e_y - s_y > 1 and e_x - s_x > 0:
-                pixelarray = pixelarray[s_y:e_y, s_x:e_x]
-                zeigebild = np.copy(pixelarray)
-        elif k == 27:
-            break
-    cv2.destroyAllWindows()
+        while True:
+            cv2.imshow("guiBild", zeigebild)
+            k = cv2.waitKey(1)
+            if k == ord("c"):
+                if s_y > e_y:
+                    s_y, e_y = e_y, s_y
+                if s_x > e_x:
+                    s_x, e_x = e_x, s_x
+                if e_y - s_y > 1 and e_x - s_x > 0:
+                    bild = bild[s_y:e_y, s_x:e_x]
+                    zeigebild = np.copy(bild)
+            elif k == 27:
+                weiter = False
+                break
+            elif k == ord("r"):
+                # neues Bild berechnen
+                berNeueGrenzen(s_y,e_y, s_x,e_x)
+                weiter = True
+                break
+        cv2.destroyAllWindows()
+    # while weiter
 
     # cv2.imshow("Original image",bild)
     # cv2.waitKey(0)

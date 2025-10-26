@@ -1,6 +1,3 @@
-### Original nach Wikipedia
-### https://de.wikipedia.org/wiki/Mandelbrot-Menge
-
 import logging
 from math import log10
 from PIL import Image
@@ -17,6 +14,9 @@ from farbig import farbe
 # abszend1: Betrag des letzten z
 
 
+###
+### experimentell
+###
 def mandelbrot(c, max_iter, z1=0):
     absmax = 1000.0
     z0 = 0.0
@@ -27,12 +27,16 @@ def mandelbrot(c, max_iter, z1=0):
             # nach 11 Iterationen erreicht
             return n, abs(z0), abs(z1)
         z0 = z1
-        z1 = z1 * z1 + c
+        z1 = z1 + z1 * c
     # if abs(z) > absmax:print(z,abs(z),n)
     return max_iter - 1, abs(z0), abs(z1)
 
 
-def mb2(c, max_iter, z1=0):
+### Original nach Wikipedia
+### https://de.wikipedia.org/wiki/Mandelbrot-Menge
+
+
+def mb0(c, max_iter, z1=0):
     absmax = 1000.0
     z0 = 0.0  # nur für erste Ausgabe
     for n in range(max_iter):
