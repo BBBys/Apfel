@@ -4,52 +4,61 @@
 ### re,im für Berechnung
 import logging
 
-dre, dim, x0, y0, sx, sy = None, None, None, None, None, None
-im_start, re_start,im_end,re_end = None,None,None, None
+xPixelProReal, yPixelProImag, xPixelReal0, yPixelImag0, sx, sy = None, None, None, None, None, None
+im_start, re_start, im_end, re_end = None, None, None, None
 
-def berNeueGrenzen(pSy, pEy, pSx, pEx):
-    re_s = berRealInX(pSx)
-    re_e = berRealInX(pEx)
-    im_s = berImagInY(pSy)
-    im_e = berImagInY(pEy)
+
+def berNeueBildGrenzen(pSy, pEy, pSx, pEx):
+    re_s = berXInReal(pSx)
+    re_e = berXInReal(pEx)
+    im_s = berYInImag(pSy)
+    im_e = berYInImag(pEy)
     berBildGrenzen(re_s, re_e, im_s, im_e)
     return
 
+
 def berBildGrenzen(pRe_start, pRe_end, pIm_start, pIm_end):
-    global re_end,im_end, re_start, im_start
+    global re_end, im_end, re_start, im_start
     re_start = pRe_start
     im_start = pIm_start
     re_end = pRe_end
     im_end = pIm_end
-    return 
+    logging.debug(
+        f"Neue Bildgrenzen gesetzt: re: {re_start}..{re_end}, im: {im_start}..{im_end}"
+    )
+    return
+
 
 def berPixelGrenzen(xWidth, yHeight):
-    global dre, dim, x0, y0, sx, sy, im_start, re_start
+    global xPixelProReal, yPixelProImag, xPixelReal0, yPixelImag0, sx, sy, im_start, re_start
     # Abstand der Pixel in Weltkoordinaten
-    dre = (re_end - re_start) / xWidth
-    dim = (im_end - im_start) / yHeight
-    logging.debug(f"Pixelabstand: dre={dre}, dim={dim}")
+    xPixelProReal = (re_end - re_start) / xWidth
+    yPixelProImag = (im_end - im_start) / yHeight
+    #logging.debug(f"Pixelabstand: dre={xPixelProReal}, dim={yPixelProImag}")
     # Nullpunkte
-    x0 = -re_start // dre
-    y0 = -im_start // dim
-    sx = 1 // dre
-    sy = 1 // dim
+    xPixelReal0 = -re_start / xPixelProReal
+    yPixelImag0 = -im_start / yPixelProImag
+    sx = 1 / xPixelProReal
+    sy = 1 / yPixelProImag
 
-    return dre, dim, x0, y0, sx, sy
+    return xPixelProReal, yPixelProImag, xPixelReal0, yPixelImag0, sx, sy
 
-def berImagInY(y):
-    global dim, im_start
-    return im_start + (y * dim)
 
-def berRealInX(x):
-    global dre, re_start
-    return re_start + (x * dre)
+def berImagInY(imag):
+    global yPixelProImag, im_start
+    return (imag - im_start) / yPixelProImag
+
+
+def berRealInX(real):
+    global xPixelProReal, re_start
+    return (real - re_start) / xPixelProReal
+
 
 def berYInImag(y):
-    global dim, im_start
-    return im_start + (y * dim)
+    global yPixelProImag, im_start
+    return im_start + (y * yPixelProImag)
 
 
 def berXInReal(x):
-    global dre, re_start
-    return re_start + (x * dre)
+    global xPixelProReal, re_start
+    return re_start + (x * xPixelProReal)

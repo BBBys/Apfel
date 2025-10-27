@@ -8,14 +8,13 @@ from math import log10
 from PIL import Image
 from farbig import farbe
 from iteration import mb0 as iterformel
-from berechnen import berPixelGrenzen, berImagInY, berRealInX
+from berechnen import berPixelGrenzen, berImagInY, berRealInX, berYInImag, berXInReal
 import numpy as np
 
 
 def generate_fractal(
     xWidth,
     yHeight,
-    #re_start,    re_end,    im_start,    im_end,
     max_iter=1000,
     loga=False,
     koord=False,
@@ -32,8 +31,8 @@ def generate_fractal(
 
     werte = np.zeros((xWidth, yHeight), dtype=np.uint16)
     pixel = np.zeros((xWidth, yHeight, 3), dtype=np.uint8)
-    logging.debug(f"werte array erstellt: {werte.shape}")
-    logging.debug(f"pixel array erstellt: {pixel.shape}")
+    #logging.debug(f"werte array erstellt: {werte.shape}")
+    #logging.debug(f"pixel array erstellt: {pixel.shape}")
 
     logging.debug(f"Generiere Fraktal: xw x yh = {xWidth}x{yHeight}")
     dre, dim, x0, y0, sx, sy = berPixelGrenzen(xWidth, yHeight)
@@ -50,40 +49,40 @@ def generate_fractal(
     else:
         fout = None
 
-    for y in range(yHeight):
-        y1 = berImagInY(y)
-        for x in range(xWidth):
-            x1 = berRealInX(x)
+    for yPixel in range(yHeight):
+        imag = berYInImag(yPixel)
+        for xPixel in range(xWidth):
+            real = berXInReal(xPixel)
             # Umrechnung von Pixelkoordinaten in komplexe Zahlen
-            c = complex(y1, x1)
+            c = complex(imag, real)
             m, abszend0, abszend1 = iterformel(c, max_iter, zstart)
-            werte[x, y] = m
-
-    for x in range(xWidth):
-        for y in range(yHeight):
-            m = werte[x, y]
-            # logging.debug(f"m({x},{y}): {m}")
+            werte[xPixel, yPixel] = m
             if fout is not None:
                 fout.write(f"{m};{abszend0};{abszend1};\n")
+
+    for xPixel in range(xWidth):
+        for yPixel in range(yHeight):
+            m = werte[xPixel, yPixel]
+            # logging.debug(f"m({x},{y}): {m}")
 
             if loga:
                 if m < 1:
                     m = 1
                 f = log10(m) / log10(max_iter)
                 cr = cg = cb = 255 - int(f * 255)
-                pixel[x, y] = (cr, cg, cb)
+                pixel[xPixel, yPixel] = (cr, cg, cb)
             else:
 
                 if m > max_iter - 2:
-                    pixel[x][y] = [0, 0, 0]
+                    pixel[xPixel][yPixel] = [0, 0, 0]
                 else:
-                    pixel[x, y] = farbe(m, 4, 55)
+                    pixel[xPixel, yPixel] = farbe(m, 4, 55)
 
             if koord:
-                if (x - x0) % sx == 0 or (y - y0) % sy == 0:
-                    pixel[x, y] = (0, 255, 0)
-                if x == x0 or y == y0:
-                    pixel[x, y] = (255, 0, 0)
+                if (xPixel - x0) % sx == 0 or (yPixel - y0) % sy == 0:
+                    pixel[xPixel, yPixel] = (0, 255, 0)
+                if xPixel == x0 or yPixel == y0:
+                    pixel[xPixel, yPixel] = (255, 0, 0)
     if fout is not None:
         fout.close()
 

@@ -2,28 +2,32 @@ import sys, logging
 from PIL import Image
 from genfrac1 import generate_fractal
 import cv2, numpy as np
-from berechnen import berBildGrenzen,berNeueGrenzen
+from berechnen import berBildGrenzen, berNeueBildGrenzen, berYInImag, berXInReal
 
 
-def mouse_callback(event, x, y, flags, param):
-    global bild, zeigebild, s_x, s_y, e_x, e_y, mouse_pressed
+def mouse_callback(event, mausX, mausY, flags, param):
+    global bild, zeigebild, xPixelVon, yPixelVon, xPixelBis, yPixelBis, mouse_pressed
     if event == cv2.EVENT_LBUTTONDOWN:
-        logging.debug(f"Mouse event: {event} at ({x},{y})")
-        logging.debug(f"Komplex ({x},{y})")
+        logging.debug(f"Mouse down at ({mausX},{mausY})")
+        logging.debug(f"Komplex ({berXInReal(mausY)},{berYInImag(mausX)})")
         mouse_pressed = True
-        s_x, s_y = x, y
+        xPixelVon, yPixelVon = mausX, mausY
         zeigebild = np.copy(bild)
     elif event == cv2.EVENT_MOUSEMOVE:
         if mouse_pressed:
+            # Bewegung und Taste:
+            # Rechteck zeichnen
             zeigebild = np.copy(bild)
-            cv2.rectangle(zeigebild, (s_x, s_y), (x, y), (0, 255, 0), 1)
+            cv2.rectangle(
+                zeigebild, (xPixelVon, yPixelVon), (mausX, mausY), (0, 255, 0), 1
+            )
     elif event == cv2.EVENT_LBUTTONUP:
         mouse_pressed = False
-        e_x, e_y = x, y
+        xPixelBis, yPixelBis = mausX, mausY
 
 
 def main(width, path, maxiter, loga, koord, statist):
-    global bild, zeigebild, s_x, s_y, e_x, e_y, mouse_pressed
+    global bild, zeigebild, xPixelVon, yPixelVon, xPixelBis, yPixelBis, mouse_pressed
 
     # height = int(1.5 * width)
     # 16x9-Format
@@ -34,21 +38,14 @@ def main(width, path, maxiter, loga, koord, statist):
 
     weiter = True
     while weiter:
-        bild = generate_fractal(
-            height,
-            width,
-            maxiter,
-            loga,
-            koord,
-            statist
-        )
+        bild = generate_fractal(height, width, maxiter, loga, koord, statist)
         # bild.write(path)
         # logging.info(
         #    f"Fraktal gespeichert als {path} ({width}x{height}), {maxiter} Iterationen"
         # )
 
         mouse_pressed = False
-        s_x = s_y = e_x = e_y = -1
+        xPixelVon = yPixelVon = xPixelBis = yPixelBis = -1
         cv2.namedWindow("guiBild", cv2.WINDOW_FULLSCREEN)
         cv2.setMouseCallback("guiBild", mouse_callback)
         zeigebild = np.copy(bild)
@@ -57,19 +54,28 @@ def main(width, path, maxiter, loga, koord, statist):
             cv2.imshow("guiBild", zeigebild)
             k = cv2.waitKey(1)
             if k == ord("c"):
-                if s_y > e_y:
-                    s_y, e_y = e_y, s_y
-                if s_x > e_x:
-                    s_x, e_x = e_x, s_x
-                if e_y - s_y > 1 and e_x - s_x > 0:
-                    bild = bild[s_y:e_y, s_x:e_x]
+                if yPixelVon > yPixelBis:
+                    yPixelVon, yPixelBis = yPixelBis, yPixelVon
+                if xPixelVon > xPixelBis:
+                    xPixelVon, xPixelBis = xPixelBis, xPixelVon
+                if yPixelBis - yPixelVon > 1 and xPixelBis - xPixelVon > 0:
+                    bild = bild[yPixelVon:yPixelBis, xPixelVon:xPixelBis]
                     zeigebild = np.copy(bild)
             elif k == 27:
                 weiter = False
                 break
             elif k == ord("r"):
-                # neues Bild berechnen
-                berNeueGrenzen(s_y,e_y, s_x,e_x)
+                # neues Bild (Re, Im) aus Pixeln (x, y) berechnen
+                #Komplex ({berXInReal(mausY)},{berYInImag(mausX)})")
+                imVon = berYInImag(xPixelVon)
+                imBis = berYInImag(xPixelBis)
+                reVon = berXInReal(yPixelVon)
+                reBis = berXInReal(yPixelBis)
+                logging.debug(
+                    f"Pixel: x: {xPixelVon}..{xPixelBis}, y: {yPixelVon}..{yPixelBis}"
+                )
+                logging.debug(f"Bild: re: {reVon}..{reBis}, im: {imVon}..{imBis}")
+                berNeueBildGrenzen(xPixelVon, xPixelBis, yPixelVon, yPixelBis)
                 weiter = True
                 break
         cv2.destroyAllWindows()
@@ -111,8 +117,8 @@ if __name__ == "__main__":
         "-m",
         dest="m",
         nargs="?",
-        default=555,
-        help="max. Iterationen [555] (Grenzwert meist ab 20 erreicht)",
+        default=20,
+        help="max. Iterationen [20] (Grenzwert meist ab 20 erreicht)",
     )
     parser.add_argument(
         "path", nargs="?", default="./bild.png", help="Dateiname für das Bild"
