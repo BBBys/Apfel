@@ -37,6 +37,14 @@ def generate_fractal(
     logging.debug(f"Generiere Fraktal: xw x yh = {xWidth}x{yHeight}")
     dre, dim, x0, y0, sx, sy = berPixelGrenzen(xWidth, yHeight)
 
+    auflösung = max(sx,sy)
+    logging.debug(f"Auflösung: {auflösung} Pixel pro Einheit")
+    logging.debug(f"max. Iteration={max_iter}")
+
+    if auflösung > 8000:
+        max_iter=int(auflösung/100)
+        logging.debug(f"Anpassung: max. Iteration={max_iter}")
+
     logging.debug(f"Nullpunkt bei x={x0}, y={y0}")
     logging.debug(f"1-Einheit bei sx={sx}, sy={sy}")
 

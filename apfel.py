@@ -1,11 +1,9 @@
-import sys, logging
-from PIL import Image
+import logging
 from genfrac1 import generate_fractal
 import cv2, numpy as np
 from berechnen import berBildGrenzen, berNeueBildGrenzen, berYInImag, berXInReal
 
-
-def mouse_callback(event, mausX, mausY, flags, param):
+def cbMaus(event, mausX, mausY, flags, param):
     global bild, zeigebild, xPixelVon, yPixelVon, xPixelBis, yPixelBis, mouse_pressed
     if event == cv2.EVENT_LBUTTONDOWN:
         logging.debug(f"Mouse down at ({mausX},{mausY})")
@@ -24,7 +22,6 @@ def mouse_callback(event, mausX, mausY, flags, param):
     elif event == cv2.EVENT_LBUTTONUP:
         mouse_pressed = False
         xPixelBis, yPixelBis = mausX, mausY
-
 
 def main(width, path, maxiter, loga, koord, statist):
     global bild, zeigebild, xPixelVon, yPixelVon, xPixelBis, yPixelBis, mouse_pressed
@@ -47,7 +44,7 @@ def main(width, path, maxiter, loga, koord, statist):
         mouse_pressed = False
         xPixelVon = yPixelVon = xPixelBis = yPixelBis = -1
         cv2.namedWindow("guiBild", cv2.WINDOW_FULLSCREEN)
-        cv2.setMouseCallback("guiBild", mouse_callback)
+        cv2.setMouseCallback("guiBild", cbMaus)
         zeigebild = np.copy(bild)
 
         while True:
