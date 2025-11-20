@@ -29,7 +29,7 @@ def generate_fractal(
     # 16x9-Format
     # Realteil senkrecht!
 
-    werte = np.zeros((xWidth, yHeight), dtype=np.uint16)
+    werte = np.zeros((xWidth, yHeight), dtype=np.uint32)
     pixel = np.zeros((xWidth, yHeight, 3), dtype=np.uint8)
     #logging.debug(f"werte array erstellt: {werte.shape}")
     #logging.debug(f"pixel array erstellt: {pixel.shape}")
@@ -39,10 +39,12 @@ def generate_fractal(
 
     auflösung = max(sx,sy)
     logging.debug(f"Auflösung: {auflösung} Pixel pro Einheit")
-    logging.debug(f"max. Iteration={max_iter}")
+    logging.debug(f"max. Iteration={max_iter} ursprünglich")
 
     if auflösung > 8000:
-        max_iter=int(auflösung/100)
+        #alte Rechnung: 8000 -> 100
+        #max_iter=int(auflösung/80)
+        max_iter=int(auflösung*auflösung*0.000001562)
         logging.debug(f"Anpassung: max. Iteration={max_iter}")
 
     logging.debug(f"Nullpunkt bei x={x0}, y={y0}")
@@ -53,7 +55,7 @@ def generate_fractal(
     if statistik:
         fout = open("iters.txt", "w")
         fout.write(f"# maxiter={max_iter}\n")
-        fout.write("iters;zend0;zend1;\n")
+        fout.write("iters;zend0;zend1;maxiter;\n")
     else:
         fout = None
 
@@ -66,7 +68,7 @@ def generate_fractal(
             m, abszend0, abszend1 = iterformel(c, max_iter, zstart)
             werte[xPixel, yPixel] = m
             if fout is not None:
-                fout.write(f"{m};{abszend0};{abszend1};\n")
+                fout.write(f"{m};{abszend0};{abszend1};{max_iter};\n")
 
     for xPixel in range(xWidth):
         for yPixel in range(yHeight):

@@ -9,7 +9,8 @@ GET DATA
   /VARIABLES=
     iters F2.0
     zend DOT18.11
-    zdanach DOT18.11.
+    zdanach DOT18.11
+    maxiter DOT18.11.
 
 
 EXAMINE 
@@ -21,8 +22,9 @@ EXAMINE
 	/MISSING=LISTWISE.
 
 NUMERIC abbruch.
-VARIABLE LABEL abbruch 'max. Iter erreicht'
-COMPUTE abbruch = iters>50.
+VARIABLE LABEL abbruch 'max. Iter erreicht'.
+value label abbruch 0 'nein' 1 'ja'.
+COMPUTE abbruch = iters>maxiter-1.
 EXECUTE.
 
 EXAMINE 

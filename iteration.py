@@ -37,11 +37,11 @@ def mandelbrot(c, max_iter, z1=0):
 
 
 def mb0(c, max_iter, z1=0):
-    absmax = 1000.0
+    absmax = 10000.0
     z0 = 0.0  # nur für erste Ausgabe
     for n in range(max_iter):
         if abs(z1) > absmax:
-            # setzt man max_iter auf 100, Grenze auf > 1000
+            # setzt man max_iter auf 100, Grenze absmax auf > 1000
             # ist der Abbruchwert in 75% der Fälle
             # nach 11 Iterationen erreicht
             return n, abs(z0), abs(z1)
