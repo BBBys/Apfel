@@ -3,3 +3,9 @@ black
 opencv-python
 #schließt numpy mit ein
 numpy
+#hilft nicht: pyqt6
+#gibts nicht: dejavu-fonts
+##qtutils
+#enum34 für fontconfig
+##enum34
+#fontconfig
